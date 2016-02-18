@@ -12,9 +12,10 @@ var textLength;
 var limits;
 
 var configNumber = 4;
-var MOOD_URI = "http://localhost:8080/";
+var MOOD_URI = "http://localhost:8070/";
+var DYMO_URI = "http://localhost:8090/";
 var LIMITS_SERVICE = "coordinateLimits";
-var COORD_SERVICE = "findNearestMoodTrack";
+var COORD_SERVICE = "findNearestTracks";
 var AUDIO_SERVICE = "loadAudioFile";
 var AUDIO_BASE_URI = "http://localhost/ilmaudio/mp3/"
 
@@ -24,6 +25,12 @@ var context;
 var fadeTime = 5;
 var offset = 30;
 var duration = 60;
+
+//dymo stuff
+var scheduler;
+var rendering;
+var uiControls = {};
+var fadePosition = 1;
 
 var Application = {
   moods : [
@@ -106,8 +113,24 @@ var Application = {
         throw new Error('Web Audio API not supported.');
     }
 
-    AudioPlayer.init();
-
+    //AudioPlayer.init();
+    scheduler = new Scheduler(context, function(){});
+    scheduler.setReverbFile("bower_components/dymo-core/audio/impulse_rev.wav");
+    
+    //init mixing dymo and rendering
+    var loader = new DymoLoader(scheduler);
+    loader.loadDymoFromJson('', 'data/mixdymo.json', function(loadedDymo) {
+      loader.loadRenderingFromJson('data/rendering.json', loadedDymo[1], function(loadedRendering) {
+        rendering = loadedRendering[0];
+        rendering.dymo = loadedDymo[0];
+        for (var key in loadedRendering[1]) {
+          var currentControl = loadedRendering[1][key];
+          if (UI_CONTROLS.indexOf(currentControl.getType()) >= 0) {
+            uiControls[key] = new UIControl(currentControl);
+          }
+        }
+      });
+    });
   },
 
   tl: { r: 200, g: 0, b: 0 },
@@ -229,7 +252,27 @@ var Application = {
     var path = dict[0].path.value;
     Application.sendRequest(MB_URI + mbid + "?inc=artist-credits&fmt=json", Application.processMBResponse);
     var uri = AUDIO_BASE_URI + path.replace(".wav", ".mp3");
-    Application.processAudioResponse(uri);
+    Application.sendRequest(DYMO_URI + "getDymoForFilename?filename=" + path + "&uri=" + uri, Application.processDymoResponse);
+    //Application.processAudioResponse(dymo);
+  },
+
+  processDymoResponse: function(dymo) {
+    new DymoLoader(scheduler).parseDymoFromJson(JSON.parse(dymo), function(loadedDymo) {
+      loadedDymo = loadedDymo[0];
+      fadePosition = 1-fadePosition;
+      rendering.dymo.replacePart(fadePosition, loadedDymo);
+      var otherDymo = rendering.dymo.getPart(1-fadePosition);
+      var currentBar = 0, currentBeat = 0;
+      if (otherDymo) {
+        currentBar = otherDymo.getPart(otherDymo.getNavigator().getPartsPlayed());
+        currentBeat = currentBar.getNavigator().getPartsPlayed();
+      }
+      loadedDymo.getPart(0).getNavigator().setPartsPlayed(currentBeat+1);
+      setTimeout(function() {
+        scheduler.play(rendering.dymo);
+        uiControls["transition"].update();
+      }, 1000);
+    });
   },
 
   processAudioResponse: function(fileuri) {
@@ -266,7 +309,7 @@ var Application = {
     var y = 1 - yclick / ch;
     var v = Application.linlin(x, 0.0, 1.0, limits.vmin, limits.vmax);
     var a = Application.linlin(y, 0.0, 1.0, limits.amin, limits.amax);
-    var uri = MOOD_URI + COORD_SERVICE + "?valence=" + v + "&arousal=" + a;
+    var uri = MOOD_URI + COORD_SERVICE + "?valence=" + v + "&arousal=" + a + "&limit=1";
     this.sendRequest(uri, this.processMoodResponse);
   },
 
