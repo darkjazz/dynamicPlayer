@@ -14,6 +14,7 @@ var limits;
 var configNumber = 4;
 var MOOD_URI = "http://localhost:8070/";
 var DYMO_URI = "http://localhost:8090/";
+var AUDIO_URI = "http://localhost:8060/";
 var LIMITS_SERVICE = "coordinateLimits";
 var COORD_SERVICE = "findNearestTracks";
 var AUDIO_SERVICE = "loadAudioFile";
@@ -251,7 +252,7 @@ var Application = {
     var mbid = dict[0].mbid.value;
     var path = dict[0].path.value;
     Application.sendRequest(MB_URI + mbid + "?inc=artist-credits&fmt=json", Application.processMBResponse);
-    var uri = AUDIO_BASE_URI + path.replace(".wav", ".mp3");
+    var uri = path; //AUDIO_BASE_URI + path.replace(".wav", ".mp3");
     Application.sendRequest(DYMO_URI + "getDymoForFilename?filename=" + path + "&uri=" + uri, Application.processDymoResponse);
     //Application.processAudioResponse(dymo);
   },
