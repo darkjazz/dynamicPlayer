@@ -14,5 +14,8 @@
   ],
   "dependencies": {
     "dymo-core": "*"
+  },
+  "devDependencies": {
+    "benchmarker": "^0.0.1"
   }
 }

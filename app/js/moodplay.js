@@ -272,7 +272,7 @@ var Application = {
       setTimeout(function() {
         scheduler.play(rendering.dymo);
         uiControls["transition"].update();
-      }, 1000);
+      }, 500);
     });
   },
 
