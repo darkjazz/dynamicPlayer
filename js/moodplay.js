@@ -12,16 +12,16 @@ var textLength;
 var limits;
 
 var configNumber = 4;
-var MOOD_URI = "http://localhost:8080/";
+var MOOD_URI = "http://127.0.0.1:8080";
 var LIMITS_SERVICE = "coordinateLimits";
-var COORD_SERVICE = "findNearestMoodTrack";
+var COORD_SERVICE = "findNearestTrack";
 var AUDIO_SERVICE = "loadAudioFile";
 var AUDIO_BASE_URI = "http://localhost/ilmaudio/mp3/"
 
 var MB_URI = "http://musicbrainz.org/ws/2/recording/";
 
 var context;
-var fadeTime = 5;
+var fadeTime = 4;
 var offset = 30;
 var duration = 60;
 
@@ -141,8 +141,6 @@ var Application = {
 	      }
     }
 
-
- 
     if (this.marker) {
       ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
       ctx.beginPath();
@@ -156,7 +154,7 @@ var Application = {
 		
 	  textLength = ctx.measureText(this.marker.title);
 	  //alertify.log(this.marker.x+' '+textLength.width);
-	  if( this.marker.y <ch/2)    {
+	if( this.marker.y <ch/2)    {
 	  	if( this.marker.x < textLength.width/2) {
 			  ctx.fillText(this.marker.title,this.marker.x+textLength.width/2,this.marker.y+35);
 			                 }
@@ -179,25 +177,11 @@ var Application = {
 		else{
 	    ctx.fillText(this.marker.title,this.marker.x ,this.marker.y-25);
 		}
-	}
+	 }
 	
-	ctx.restore();	
-    }
+	 ctx.restore();	
+  }
     
-   // if(!start)
-    //{
-    //	ctx.save();
-	  //  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-	    //ctx.fillRect(0, 0, cw, ch);
-	    //ctx.translate(cw/2, ch/2-50);
-//	    ctx.font = "16px Arial";
-//	    ctx.fillStyle = "rgb(255,255,255)";
-//	    ctx.textAlign = 'center';
-//	    ctx.fillText("Find the emotional direction on the canvas and click the word tag to send your expected emotion. The visualisation screen shown on stage would display the emotion instruction that most audience' expectation. Notice that you shouldn't send the instruction so frequently.", 0, 0);  
-//	    ctx.restore();
-//	  }
-  },
-
   sendRequest: function(uri, callback) {
     var request = new XMLHttpRequest();
     request.open('GET', uri, true); 
