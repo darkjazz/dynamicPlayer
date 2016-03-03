@@ -28,10 +28,9 @@ var offset = 30;
 var duration = 60;
 
 //dymo stuff
-var scheduler;
-var rendering;
-var uiControls = {};
-var fadePosition = 1;
+var dymoManager;
+var fadePosition = 0;
+var isPlaying = false;
 
 var Application = {
   moods : [
@@ -114,24 +113,8 @@ var Application = {
         throw new Error('Web Audio API not supported.');
     }
 
-    //AudioPlayer.init();
-    scheduler = new Scheduler(context, function(){});
-    scheduler.setReverbFile("bower_components/dymo-core/audio/impulse_rev.wav");
-    
-    //init mixing dymo and rendering
-    var loader = new DymoLoader(scheduler);
-    loader.loadDymoFromJson('', 'data/mixdymo.json', function(loadedDymo) {
-      loader.loadRenderingFromJson('data/rendering.json', loadedDymo[1], function(loadedRendering) {
-        rendering = loadedRendering[0];
-        rendering.dymo = loadedDymo[0];
-        for (var key in loadedRendering[1]) {
-          var currentControl = loadedRendering[1][key];
-          if (UI_CONTROLS.indexOf(currentControl.getType()) >= 0) {
-            uiControls[key] = new UIControl(currentControl);
-          }
-        }
-      });
-    });
+    dymoManager = new DymoManager(context, 2);
+    dymoManager.loadDymoAndRendering('data/mixdymo.json', 'data/rendering.json');
   },
 
   tl: { r: 200, g: 0, b: 0 },
@@ -258,20 +241,23 @@ var Application = {
   },
 
   processDymoResponse: function(dymo) {
-    new DymoLoader(scheduler).parseDymoFromJson(JSON.parse(dymo), function(loadedDymo) {
-      loadedDymo = loadedDymo[0];
+    dymoManager.loadDymoFromJson(JSON.parse(dymo), function(nextSongDymo) {
+      var currentSongDymo = dymoManager.getTopDymo().getPart(fadePosition);
       fadePosition = 1-fadePosition;
-      rendering.dymo.replacePart(fadePosition, loadedDymo);
-      var otherDymo = rendering.dymo.getPart(1-fadePosition);
-      var currentBar = 0, currentBeat = 0;
-      if (otherDymo) {
-        currentBar = otherDymo.getPart(otherDymo.getNavigator().getPartsPlayed());
+      dymoManager.getTopDymo().replacePart(fadePosition, nextSongDymo);
+      //sync the loaded dymos to be in the same metrical position
+      var currentBeat = 0;
+      if (currentSongDymo) {
+        var currentBar = currentSongDymo.getPart(currentSongDymo.getNavigator().getPartsPlayed());
         currentBeat = currentBar.getNavigator().getPartsPlayed();
       }
-      loadedDymo.getPart(0).getNavigator().setPartsPlayed(currentBeat+1);
+      nextSongDymo.getPart(0).getNavigator().setPartsPlayed(currentBeat+1);
       setTimeout(function() {
-        scheduler.play(rendering.dymo);
-        uiControls["transition"].update();
+        if (!isPlaying) {
+          dymoManager.startPlaying();
+          isPlaying = true;
+        }
+        dymoManager.getUIControl("transition").update();
       }, 500);
     });
   },
