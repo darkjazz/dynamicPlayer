@@ -1,23 +1,6 @@
-var cw;
-var ch;
-//var start = false;
-var clicked = false;
-//
-var xclick;
-var yclick;
-
 var textLength;
 
 var limits;
-
-var configNumber = 4;
-var MOOD_URI = "http://127.0.0.1:8080";
-var LIMITS_SERVICE = "coordinateLimits";
-var COORD_SERVICE = "findNearestTrack";
-var AUDIO_SERVICE = "loadAudioFile";
-var AUDIO_BASE_URI = "http://localhost/ilmaudio/mp3/"
-
-var MB_URI = "http://musicbrainz.org/ws/2/recording/";
 
 var context;
 var fadeTime = 4;
@@ -119,7 +102,7 @@ function animate() {
 			translateY: event.pageY - 30
 		}, {duration: 4000});
 		assignCursorEvents();
-		myMoodplay.sendSPARQLQuery();
+		myMoodplay.sendSPARQLQuery(event.pageX / screenWidth, ( 1.0 - (event.pageY / screenHeight)));
 	});
 }
 
@@ -143,9 +126,21 @@ var translateZMin = -725,
 	translateZMax = 0;
 
 var containerAnimationMap = {
-		perspective: [ 215, 50 ],
-		opacity: [ 0.90, 0.55 ]
-};
+	perspective: [ 215, 50 ],
+	opacity: [ 0.90, 0.55 ]};
+
+var uri = MOOD_URI + "/" + LIMITS_QUERY + "?configNumber=" + configNumber;
+myMoodplay.sendRequest(uri, myMoodplay.processLimitsResponse);
+
+try {
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  context = new AudioContext();
+} catch(e) {
+    throw new Error('Web Audio API not supported.');
+}
+
+myMoodplay.init();
+AudioPlayer.init();
 
 $("#metadata").velocity({
 	translateY: (screenHeight - 90) + "px",

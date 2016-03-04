@@ -14,7 +14,7 @@ var AudioPlayer = {
       context.decodeAudioData(request.response, function(buffer) {
         if (AudioPlayer.enabled) { 
           track = { "filename": filename };
-          Application.playlist.push(track);
+          myMoodplay.playlist.push(track);
           AudioPlayer.createSource(buffer, filename);
         }
       }, function(err) {

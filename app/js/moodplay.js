@@ -205,6 +205,7 @@ var Application = {
 	
 	 ctx.restore();	
   }
+},
     
   sendRequest: function(uri, callback) {
     var request = new XMLHttpRequest();
