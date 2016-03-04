@@ -147,6 +147,13 @@ $("#metadata").velocity({
 	opacity: 0
 }, { duration: 10 });
 
+$("#menuIcon").velocity({
+	translateX: "20px",
+	translateY: "20px",
+	opacity: 0.2
+}, { duration: 10 });
+
+
 for (var m = 0; m < myMoodplay.moods.length; m++)
 {
 	dotsHtml += "<div id='%1' class='dot'>%1</div>".replace("%1", myMoodplay.moods[m][0].replace(" ", "")).replace("%1", myMoodplay.moods[m][0]);

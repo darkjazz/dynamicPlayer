@@ -138,6 +138,16 @@ a:hover {
 	margin-left: 10px;
 }
 
+#menuIcon{
+	position: fixed;
+	opacity: 0.7;
+}
+
+#menuIcon img{
+	width: "64px";
+	height: "64px";
+}
+
 .mood {
 	position: fixed;
 	width: 30px;
