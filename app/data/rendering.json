@@ -1,15 +1,15 @@
 {
 	"mappings":[
 		{
-			"domainDims":[{"name":"fadeRamp","type":"Ramp"}],
+			"domainDims":[{"name":"fadeRamp","type":"Ramp","value":0,"duration":3}],
 			"function":{"args":["a"],"body":"return a;"},
-			"dymos":["dymo0"],
+			"dymos":["mix"],
 			"parameter":"Fade"
 		},
 		{
 			"domainDims":[{"name":"fade","type":"Slider"}],
 			"function":{"args":["a"],"body":"return a;"},
-			"dymos":["dymo0"],
+			"dymos":["mix"],
 			"parameter":"Fade"
 		},
 		{
@@ -28,7 +28,7 @@
 			"domainDims":[{"name":"transition","type":"Button"}],
 			"function":{"args":["a"],"body":"return a;"},
 			"controls":["fadeRamp"],
-			"parameter":"RampTrigger"
+			"parameter":"AutoControlTrigger"
 		}
 	]
 }

@@ -1,5 +1,5 @@
 {
-	"@id":"dymo0",
+	"@id":"mix",
 	"@type":"Dymo",
 	"ct":"parallel",
 	"mappings":[
@@ -17,12 +17,12 @@
 		},
 		{
 			"domainDims":[{"name":"Fade","type":"Parameter"},{"name":"afv:Tempo","type":"Feature"}],
-			"function":{"args":["a", "b"],"body":"return b[0]+a*(b[1]-b[0]);"},
-			"dymos":["dymo0"],
+			"function":{"args":["a", "b"],"body":"console.log('tempo '+(b[0]+a*(b[1]-b[0]))); return b[0]+a*(b[1]-b[0]);"},
+			"dymos":["mix"],
 			"parameter":"Tempo"
 		}
 	],
-	"parts":["data/roll-dymo.json","data/low-dymo.json"],
+	"parts":["roll-dymo.json","low-dymo.json"],
 	"similars":[],
 	"@context":"http://purl.org/ontology/dymo/context.json"
 }
